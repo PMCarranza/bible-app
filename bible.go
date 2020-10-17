@@ -6,6 +6,7 @@ import (
 	"fyne.io/fyne"
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/canvas"
+	"fyne.io/fyne/dialog"
 	"fyne.io/fyne/layout"
 	"fyne.io/fyne/widget"
 )
@@ -17,7 +18,7 @@ func cell() fyne.CanvasObject {
 }
 
 func fondo() fyne.CanvasObject {
-	fondo := canvas.NewRectangle(&color.RGBA{147, 220, 245, 5})
+	fondo := canvas.NewRectangle(&color.RGBA{10, 23, 35, 5})
 	fondo.SetMinSize(fyne.NewSize(120, 120))
 	return fondo
 }
@@ -34,11 +35,21 @@ func main() {
 	left := cell()
 	right := cell()
 
+	w.Resize(fyne.NewSize(300, 200))
+	d := dialog.NewCustom("Title", "OK", widget.NewLabel("Content"), w)
+
+	d.Show()
+
 	middle := widget.NewLabelWithStyle("test\ntest\ntest\ntest", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
 	borderLayout := layout.NewBorderLayout(top, bottom, left, right)
-
+	middle.Hide()
 	pageLayout := fyne.NewContainerWithLayout(borderLayout, top, bottom, left, right, underside, middle)
 	w.SetContent(pageLayout)
+
+	middleTwo := widget.NewLabelWithStyle("test Two\ntest Two\ntest Two\ntest Two", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+	pageLayoutTwo := fyne.NewContainerWithLayout(borderLayout, top, bottom, left, right, underside, middleTwo)
+
+	w.SetContent(pageLayoutTwo)
 
 	w.Resize(fyne.NewSize(600, 600))
 	w.SetFixedSize(false)

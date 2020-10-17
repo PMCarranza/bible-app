@@ -1,5 +1,5 @@
-module book.com/user/bible
+module bible-app
 
-go 1.14
+go 1.15
 
-require fyne.io/fyne v1.2.4
+require fyne.io/fyne v1.3.3
