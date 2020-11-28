@@ -1,12 +1,14 @@
 package main
 
 import (
+	biblelibhc "bible-app/biblelibhc"
 	"image/color"
+	"log"
+	"strings"
 
 	"fyne.io/fyne"
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/canvas"
-	"fyne.io/fyne/dialog"
 	"fyne.io/fyne/layout"
 	"fyne.io/fyne/widget"
 )
@@ -24,6 +26,7 @@ func fondo() fyne.CanvasObject {
 }
 
 func main() {
+
 	a := app.New()
 
 	w := a.NewWindow("Bible App")
@@ -35,23 +38,74 @@ func main() {
 	left := cell()
 	right := cell()
 
-	w.Resize(fyne.NewSize(300, 200))
-	d := dialog.NewCustom("Title", "OK", widget.NewLabel("Content"), w)
+	w.Resize(fyne.NewSize(200, 200))
 
-	d.Show()
+	//	bookQuery := "bcv:Genesis/050:025"
+	//    bookQuery := "bcv:Genesis/010:016"
+	//    bookQuery := "bcv:Genesis/010:026"
+	//	bookQuery := "bcv:Revelation/011:006"
+	//	bookQuery := "bcv:Revelation/011:017"
+	//  bookQuery := "bcv:Genesis/001:001"
+	//  bookQuery := "bcv:Genesis/040:010"
+	//    bookQuery := "bcv:Psalms/023:001"
+	//    bookQuery := "phrase:swore to Abraham"
+	//    bookQuery := "seqphrase:the name of Jesus"
+	//    bookQuery := "seqphrase:Christ"
+	bookQuery := "booklist:"
+	//    bookQuery :=
+	queryResponse := biblelibhc.Query(bookQuery, 20)
 
-	middle := widget.NewLabelWithStyle("test\ntest\ntest\ntest", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+	pageBody := widget.NewLabelWithStyle(queryResponse.Body.String(), fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
 	borderLayout := layout.NewBorderLayout(top, bottom, left, right)
-	middle.Hide()
-	pageLayout := fyne.NewContainerWithLayout(borderLayout, top, bottom, left, right, underside, middle)
+	pageBody.Wrapping = fyne.TextWrapWord
+	// pageBody.Hide()
+	pageLayout := fyne.NewContainerWithLayout(borderLayout, top, bottom, left, right, underside, pageBody)
 	w.SetContent(pageLayout)
 
-	middleTwo := widget.NewLabelWithStyle("test Two\ntest Two\ntest Two\ntest Two", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
-	pageLayoutTwo := fyne.NewContainerWithLayout(borderLayout, top, bottom, left, right, underside, middleTwo)
+	canvasSize := fyne.NewSize(800, 400)
 
-	w.SetContent(pageLayoutTwo)
-
-	w.Resize(fyne.NewSize(600, 600))
+	w.Resize(canvasSize)
 	w.SetFixedSize(false)
+
+	canvasTile := canvasSize.Width / 7
+
+	popupPosition := fyne.NewPos(canvasTile, canvasSize.Height/2)
+
+	popupSize := fyne.Size{Width: canvasSize.Width - 2*canvasTile, Height: 40}
+	popupText := queryResponse.Body.String()
+	//	popupText = strings.ReplaceAll(popupText, ",", "·")
+	popupText = strings.ReplaceAll(popupText, ",", ".")
+	popup := widget.NewTickerPopUpAtPosition(widget.NewLabel(popupText), w.Canvas(), popupPosition, popupSize)
+	popup.Resize(popupSize)
+	popup.Show()
+
 	w.ShowAndRun()
+	// q.ShowAndRun()
+
 }
+
+type tappableIcon struct {
+	widget.Icon
+}
+
+func newTappableIcon(res fyne.Resource) *tappableIcon {
+	icon := &tappableIcon{}
+	icon.ExtendBaseWidget(icon)
+	icon.SetResource(res)
+
+	return icon
+}
+
+func (t *tappableIcon) Tapped(_ *fyne.PointEvent) {
+	log.Println("I have been tapped")
+}
+
+func (t *tappableIcon) TappedSecondary(_ *fyne.PointEvent) {
+}
+
+// func secondMain() {
+// 	p := app.New()
+// 	q := p.NewWindow("Tappable")
+// 	q.SetContent(newTappableIcon(theme.FyneLogo()))
+// 	q.ShowAndRun()
+// }
